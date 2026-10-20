@@ -26,10 +26,15 @@
     {
       devShells = forEachSystem (
         { pkgs, system }:
+        let
+          python = pkgs.python3.withPackages (pkgs: with pkgs; [
+          ]);
+        in
         {
           default = pkgs.mkShell
           {
             packages = with pkgs; [
+              python
               logisim
             ];
           };
