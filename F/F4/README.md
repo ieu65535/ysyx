@@ -153,3 +153,60 @@ PC sum i
 (9, 55, 11) # 终端输出"sum = 55"
 (END, 55, 11)
 ```
+
+### F4.4.1
+
+之前在[F3.7.14](../F3/README.md#f3714)搭建的求和电路，只用到两个寄存器
+
+注意这里是16进制（之前都是10进制）
+
+```
+i sum
+(0, 0)
+(1, 1)
+(2, 3)
+(3, 6)
+(4, a)
+(5, f)
+(6, 15)
+(7, 1c)
+(8, 24)
+(9, 2d)
+(a, 37)
+(a, 37)
+```
+
+### F4.5.1
+
+在这个例子中，可以把r2看作sum对应的状态，r1看作i对应的状态
+
+### F4.5.2
+
+以下是x86-64 gcc 16.2的汇编
+
+```asm
+.LC0:
+        .string "sum = %d\n"
+"main":
+        push    rbp
+        mov     rbp, rsp
+        sub     rsp, 16
+        mov     DWORD PTR [rbp-4], 0
+        mov     DWORD PTR [rbp-8], 1
+.L2:
+        mov     eax, DWORD PTR [rbp-8]
+        add     DWORD PTR [rbp-4], eax
+        add     DWORD PTR [rbp-8], 1
+        cmp     DWORD PTR [rbp-8], 10
+        jle     .L2
+        mov     eax, DWORD PTR [rbp-4]
+        mov     esi, eax
+        mov     edi, OFFSET FLAT:.LC0
+        mov     eax, 0
+        call    "printf"
+        mov     eax, 0
+        leave
+        ret
+```
+
+这里可以认为sum对应的是`DWORD PTR [rbp-4]`，而i对应的是`DWORD PTR [rbp-8]`。和之前的例子不太一样的是，这里的状态是内存而不是通用寄存器
